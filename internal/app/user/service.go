@@ -8,7 +8,7 @@ import (
 type UserService interface {
 	CreateUser(user *User) (*User, error)
 	UpdateUser(user *User, id int) (*User, error)
-	DeleteUser(user *User) (*User, error)
+	DeleteUser(userId int) (*User, error)
 	GetUserById(userId int) (*User, error)
 	GetAllUsers(page int, items int) ([]*User, error)
 }
@@ -37,7 +37,11 @@ func (u userService) UpdateUser(user *User, id int) (*User, error) {
 	return dbUser, nil
 }
 
-func (u userService) DeleteUser(user *User) (*User, error) {
+func (u userService) DeleteUser(userId int) (*User, error) {
+	user, err := u.GetUserById(userId)
+	if err != nil {
+		u.Logger.Error(err.Error())
+	}
 	dbUser, err := u.UserRepository.DeleteUser(user)
 	if err != nil {
 		u.Logger.Error(err.Error())

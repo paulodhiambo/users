@@ -1,13 +1,16 @@
 package user
 
-import "log/slog"
+import (
+	"fmt"
+	"log/slog"
+)
 
 type UserService interface {
 	CreateUser(user *User) (*User, error)
-	UpdateUser(user *User) (*User, error)
+	UpdateUser(user *User, id int) (*User, error)
 	DeleteUser(user *User) (*User, error)
 	GetUserById(userId int) (*User, error)
-	GetAllUsers() ([]*User, error)
+	GetAllUsers(page int, items int) ([]*User, error)
 }
 
 type userService struct {
@@ -16,28 +19,49 @@ type userService struct {
 }
 
 func (u userService) CreateUser(user *User) (*User, error) {
-	//TODO implement me
-	panic("implement me")
+	dbUser, err := u.UserRepository.CreateUser(user)
+	if err != nil {
+		u.Logger.Error(err.Error())
+		return nil, err
+	}
+	u.Logger.Info(fmt.Sprintf("User %v created successfully", dbUser))
+	return dbUser, nil
 }
 
-func (u userService) UpdateUser(user *User) (*User, error) {
-	//TODO implement me
-	panic("implement me")
+func (u userService) UpdateUser(user *User, id int) (*User, error) {
+	dbUser, err := u.UserRepository.UpdateUser(user, id)
+	if err != nil {
+		u.Logger.Error(err.Error())
+	}
+	u.Logger.Info(fmt.Sprintf("User %v updated successfully", dbUser))
+	return dbUser, nil
 }
 
 func (u userService) DeleteUser(user *User) (*User, error) {
-	//TODO implement me
-	panic("implement me")
+	dbUser, err := u.UserRepository.DeleteUser(user)
+	if err != nil {
+		u.Logger.Error(err.Error())
+	}
+	u.Logger.Info(fmt.Sprintf("User %v deleted successfully", dbUser))
+	return dbUser, nil
 }
 
 func (u userService) GetUserById(userId int) (*User, error) {
-	//TODO implement me
-	panic("implement me")
+	dbUser, err := u.UserRepository.GetUserByID(userId)
+	if err != nil {
+		u.Logger.Error(err.Error())
+	}
+	u.Logger.Info(fmt.Sprintf("User %v retrieved successfully", dbUser))
+	return dbUser, nil
 }
 
-func (u userService) GetAllUsers() ([]*User, error) {
-	//TODO implement me
-	panic("implement me")
+func (u userService) GetAllUsers(page int, items int) ([]*User, error) {
+	users, err := u.UserRepository.GetAllUsers(page, items)
+	if err != nil {
+		u.Logger.Error(err.Error())
+	}
+	u.Logger.Info(fmt.Sprintf("User %v retrieved successfully", users))
+	return users, nil
 }
 
 func NewUserServiceImpl(userRepository UserRepository, logger *slog.Logger) UserService {
